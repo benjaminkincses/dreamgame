@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DreamGame - describe a game, play it</title>
+<meta name="description" content="Type a game idea, get a playable browser game in seconds. Powered by Pollinations, paid from your own balance.">
+<script defer src="https://cdn.jsdelivr.net/npm/@pollinations/ui@0.1.0-alpha.20/dist/connect.js"></script>
+<style>
+  :root{--bg:#101014;--panel:#191920;--line:#2b2b36;--text:#eceaf2;--muted:#9a97a8;--accent:#ffb020;--accent2:#ff7847;--ok:#57d977;--err:#ff6b5e}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+  header{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:14px 20px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+  .brand{font-size:22px;font-weight:800;letter-spacing:.3px}
+  .brand span{color:var(--accent)}
+  .tag{color:var(--muted);font-size:13px;margin-top:2px}
+  main{max-width:1060px;margin:0 auto;padding:20px}
+  .panel{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px}
+  label{font-size:13px;color:var(--muted);display:block;margin-bottom:6px}
+  textarea{width:100%;min-height:74px;resize:vertical;background:#0d0d11;color:var(--text);border:1px solid var(--line);border-radius:8px;padding:10px 12px;font-size:16px;font-family:inherit}
+  textarea:focus{outline:2px solid var(--accent);outline-offset:0;border-color:transparent}
+  .chips{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0 14px}
+  .chip{background:#0d0d11;border:1px solid var(--line);color:var(--text);border-radius:999px;padding:6px 12px;font-size:13px;cursor:pointer}
+  .chip:hover{border-color:var(--accent)}
+  .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+  select{background:#0d0d11;color:var(--text);border:1px solid var(--line);border-radius:8px;padding:9px;font-size:14px}
+  button{border:0;border-radius:8px;padding:10px 18px;font-size:15px;font-weight:700;cursor:pointer}
+  .primary{background:linear-gradient(90deg,var(--accent),var(--accent2));color:#16130a}
+  .primary:disabled{opacity:.55;cursor:wait}
+  .ghost{background:#0d0d11;color:var(--text);border:1px solid var(--line);font-weight:600}
+  .ghost:hover{border-color:var(--accent)}
+  #status{font-size:14px;color:var(--muted);min-height:20px;margin-top:12px}
+  #status.ok{color:var(--ok)} #status.err{color:var(--err)}
+  .stage{margin-top:18px}
+  .stage-head{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px}
+  .stage-title{font-weight:700}
+  .frame-wrap{background:#000;border:1px solid var(--line);border-radius:12px;overflow:hidden}
+  iframe{display:block;width:100%;height:640px;border:0;background:#000}
+  .hint{color:var(--muted);font-size:13px;margin-top:8px}
+  footer{max-width:1060px;margin:0 auto;padding:6px 20px 28px;color:var(--muted);font-size:13px}
+  a{color:var(--accent)}
+  code{background:#0d0d11;padding:1px 5px;border-radius:4px}
+</style>
+</head>
+<body>
+<header>
+  <div>
+    <div class="brand">Dream<span>Game</span></div>
+    <div class="tag">Describe a game. Play it seconds later.</div>
+  </div>
+  <polli-connect budget="5" expiry="7"></polli-connect>
+</header>
+
+<main>
+  <section class="panel">
+    <label for="prompt">What game do you want?</label>
+    <textarea id="prompt" placeholder="a snake game but you are a dragon eating knights">a snake game but you are a dragon eating knights</textarea>
+    <div class="chips">
+      <button class="chip" type="button" data-prompt="a snake game but you are a dragon eating knights">Dragon snake</button>
+      <button class="chip" type="button" data-prompt="a breakout game where the ball is a fireball and the bricks are ice blocks that melt">Fireball breakout</button>
+      <button class="chip" type="button" data-prompt="a tiny spaceship shooter: dodge asteroids, blast drones, grab stars for points">Spaceship shooter</button>
+    </div>
+    <div class="row">
+      <select id="model" aria-label="Model">
+        <option value="z-ai/glm-5.3-flash" selected>GLM 5.3 Flash (fast)</option>
+        <option value="deepseek/deepseek-v4.1-flash">DeepSeek V4.1 Flash</option>
+        <option value="openai/gpt-5.3-codex">GPT 5.3 Codex</option>
+        <option value="moonshotai/kimi-k2.7-code">Kimi K2.7 Code</option>
+        <option value="qwen/qwen3-coder-next">Qwen3 Coder Next</option>
+      </select>
+      <button class="primary" id="generate" type="button">Generate game</button>
+      <button class="ghost" id="example" type="button">Play the example</button>
+    </div>
+    <div id="status">Loading the built-in example. Sign in with Pollinations to generate your own.</div>
+  </section>
+
+  <section class="stage">
+    <div class="stage-head">
+      <div class="stage-title" id="gameTitle">Example: Dragon Snake</div>
+      <div class="row">
+        <button class="ghost" id="share" type="button">Copy share link</button>
+        <button class="ghost" id="download" type="button">Download HTML</button>
+      </div>
+    </div>
+    <div class="frame-wrap">
+      <iframe id="stage" title="Generated game" sandbox="allow-scripts" referrerpolicy="no-referrer"></iframe>
+    </div>
+    <div class="hint">Click the game, then use the keyboard or mouse it asks for. Games run in a sandbox and cannot touch this page or your account.</div>
+  </section>
+</main>
+
+<footer>
+  Generation runs on <a href="https://pollinations.ai" target="_blank" rel="noopener">Pollinations</a> models and is paid from your own Pollinations balance when you sign in. No key, no generation: the built-in example always works. Built for Pollinations quest #20021.
+</footer>
+
+<script>
+const SYSTEM_PROMPT = [
+  "You are a game generator. Given a game description, output ONE complete, self-contained HTML file for a playable browser game.",
+  "Rules:",
+  "- Output ONLY the HTML. No markdown fences, no explanations, no text before or after.",
+  "- Single HTML file: inline <style> and <script>, one <canvas>, vanilla JavaScript.",
+  "- No external scripts, styles, fonts or images. Draw everything with canvas. Do not use localStorage.",
+  "- Keyboard and/or mouse controls, score display, start screen, game over screen with restart.",
+  "- The game starts on a user click or keypress. Keep it compact but complete and bug-free.",
+  "- Match the description closely and make it fun."
+].join("\n");
+
+const stage = document.getElementById('stage');
+const statusEl = document.getElementById('status');
+const titleEl = document.getElementById('gameTitle');
+const genBtn = document.getElementById('generate');
+let apiKey = null;
+let currentHtml = null;
+let currentName = 'game';
+
+function setStatus(msg, cls) {
+  statusEl.textContent = msg;
+  statusEl.className = cls || '';
+}
+
+function extractHtml(text) {
+  let t = (text || '').trim();
+  t = t.replace(/^```[a-zA-Z]*\s*/, '').replace(/```\s*$/, '');
+  const lower = t.toLowerCase();
+  let start = lower.indexOf('<!doctype');
+  if (start === -1) start = lower.indexOf('<html');
+  const end = lower.lastIndexOf('</html>');
+  if (start !== -1 && end !== -1) return t.slice(start, end + 7);
+  return t;
+}
+
+function loadGame(html, name) {
+  currentHtml = html;
+  currentName = name || 'game';
+  stage.removeAttribute('src');
+  stage.srcdoc = html;
+  titleEl.textContent = currentName;
+}
+
+async function loadExample() {
+  try {
+    const res = await fetch('example-game.html');
+    const html = await res.text();
+    loadGame(html, 'Example: Dragon Snake (pre-generated)');
+    if (!apiKey) setStatus('Example loaded. Sign in with Pollinations (top right) to generate your own game from a description.');
+  } catch (e) {
+    setStatus('Could not load the example game.', 'err');
+  }
+}
+
+// --- share links: gzip + base64url in the URL hash ---
+function b64urlEncode(bytes) {
+  let bin = '';
+  const chunk = 0x8000;
+  for (let i = 0; i < bytes.length; i += chunk) {
+    bin += String.fromCharCode.apply(null, bytes.subarray(i, i + chunk));
+  }
+  return btoa(bin).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+}
+function b64urlDecode(str) {
+  const b64 = str.replace(/-/g, '+').replace(/_/g, '/');
+  const bin = atob(b64 + '='.repeat((4 - b64.length % 4) % 4));
+  const bytes = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+  return bytes;
+}
+async function encodeGame(html) {
+  const bytes = new TextEncoder().encode(html);
+  if (window.CompressionStream) {
+    const stream = new Blob([bytes]).stream().pipeThrough(new CompressionStream('gzip'));
+    const buf = new Uint8Array(await new Response(stream).arrayBuffer());
+    return 'z' + b64urlEncode(buf);
+  }
+  return 'r' + b64urlEncode(bytes);
+}
+async function decodeGame(code) {
+  const kind = code.charAt(0);
+  const bytes = b64urlDecode(code.slice(1));
+  if (kind === 'z') {
+    const stream = new Blob([bytes]).stream().pipeThrough(new DecompressionStream('gzip'));
+    const buf = await new Response(stream).arrayBuffer();
+    return new TextDecoder().decode(buf);
+  }
+  return new TextDecoder().decode(bytes);
+}
+
+document.getElementById('share').addEventListener('click', async () => {
+  if (!currentHtml) { setStatus('Nothing to share yet.', 'err'); return; }
+  const code = await encodeGame(currentHtml);
+  const url = location.origin + location.pathname + '#g=' + code;
+  try {
+    await navigator.clipboard.writeText(url);
+    setStatus('Share link copied. Anyone opening it plays this exact game.', 'ok');
+  } catch (e) {
+    location.hash = 'g=' + code;
+    setStatus('Share link is in the address bar now. Copy it from there.', 'ok');
+  }
+});
+
+document.getElementById('download').addEventListener('click', () => {
+  if (!currentHtml) { setStatus('Nothing to download yet.', 'err'); return; }
+  const blob = new Blob([currentHtml], { type: 'text/html' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = currentName.replace(/[^a-z0-9]+/gi, '-').toLowerCase() + '.html';
+  a.click();
+  URL.revokeObjectURL(a.href);
+});
+
+document.querySelectorAll('.chip').forEach(chip => {
+  chip.addEventListener('click', () => {
+    document.getElementById('prompt').value = chip.dataset.prompt;
+    document.getElementById('prompt').focus();
+  });
+});
+document.getElementById('example').addEventListener('click', loadExample);
+
+genBtn.addEventListener('click', async () => {
+  const prompt = document.getElementById('prompt').value.trim();
+  if (!prompt) { setStatus('Describe a game first.', 'err'); return; }
+  if (!apiKey) {
+    setStatus('You are in demo mode. Sign in with Pollinations (top right) and generation runs on your own balance. The example game below always works.');
+    loadExample();
+    return;
+  }
+  const model = document.getElementById('model').value;
+  genBtn.disabled = true;
+  setStatus('Generating with ' + model + ' ... this usually takes 10 to 60 seconds.');
+  try {
+    const res = await fetch('https://gen.pollinations.ai/v1/chat/completions', {
+      method: 'POST',
+      headers: { 'Authorization': 'Bearer ' + apiKey, 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: model,
+        messages: [
+          { role: 'system', content: SYSTEM_PROMPT },
+          { role: 'user', content: prompt }
+        ],
+        max_tokens: 16000,
+        temperature: 0.8
+      })
+    });
+    if (!res.ok) {
+      const errText = await res.text();
+      throw new Error('API ' + res.status + ': ' + errText.slice(0, 200));
+    }
+    const data = await res.json();
+    const html = extractHtml(data.choices[0].message.content);
+    if (!/<canvas/i.test(html) && !/<script/i.test(html)) throw new Error('The model did not return a playable game. Try again or pick another model.');
+    loadGame(html, 'Your game: ' + prompt.slice(0, 60));
+    setStatus('Done. Click the game to play. Copy the share link to send it to anyone.', 'ok');
+  } catch (e) {
+    setStatus('Generation failed: ' + e.message, 'err');
+  } finally {
+    genBtn.disabled = false;
+  }
+});
+
+// --- Pollinations sign-in (BYOP drop-in) ---
+const connectEl = document.querySelector('polli-connect');
+function refreshKey() {
+  const k = connectEl && connectEl.apiKey;
+  if (k && k !== apiKey) {
+    apiKey = k;
+    setStatus('Signed in. Generation now runs on your Pollinations balance.', 'ok');
+  } else if (!k && apiKey) {
+    apiKey = null;
+    setStatus('Signed out. Demo mode: the example game still works, generation needs sign-in.');
+  }
+}
+if (connectEl) {
+  connectEl.addEventListener('change', refreshKey);
+  setTimeout(refreshKey, 800);
+}
+
+// --- boot: shared game from hash, else the example ---
+(async function boot() {
+  if (location.hash.startsWith('#g=')) {
+    try {
+      const html = await decodeGame(location.hash.slice(3));
+      loadGame(html, 'Shared game');
+      setStatus('Shared game loaded. Sign in to generate your own.', 'ok');
+      return;
+    } catch (e) {
+      setStatus('That share link could not be decoded. Loading the example instead.', 'err');
+    }
+  }
+  loadExample();
+})();
+</script>
+</body>
+</html>
