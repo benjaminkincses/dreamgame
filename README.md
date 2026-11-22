@@ -1,5 +1,7 @@
 # DreamGame
 
+[![Made with pollinations.ai](https://raw.githubusercontent.com/pollinations/pollinations/main/packages/ui/src/brand/badge-made-with.svg)](https://pollinations.ai/?ref=badge)
+
 Describe a game, get a playable game. Type an idea ("a snake game but you are a dragon eating knights"), hit generate, and a Pollinations text model writes a complete single-file HTML5 game that runs right on the page.
 
 Live: https://benjaminkincses.github.io/dreamgame/
